@@ -1,4 +1,4 @@
-program Day01_Part2;
+program Day02_Part2;
 
 uses crt;
 
@@ -10,8 +10,8 @@ const
   maxDraws = 64;
 
 var
-  game: array[0..maxGames, 0..maxDraws, 0..2] of integer;
-  result: integer;
+  game: array[0..maxGames, 0..maxDraws, 0..2] of shortint;
+  result: real;
 
 function stringBefore(content, before: string): string;
 var
@@ -86,7 +86,6 @@ begin
     gameNr :=toInt(stringBetween(gameText, 'Game ', ':')) - 1;
     gameText := stringAfter(gameText, ': ');
 
-
     repeat
       drawText := stringBefore(gameText, ';');
 
@@ -117,21 +116,26 @@ begin
   close(f);
 end;
 
-function calculateResult(redCubes, greenCubes, blueCubes: integer): integer;
+function calculateResult: real;
 var
-  gameTotal: integer;
+  gameTotal: real;
   gameNumber: integer;
   drawNumber: integer;
   redDraws: integer;
   blueDraws: integer;
   greenDraws: integer;
-  validGame: boolean;
+  maxGreen: integer;
+  maxRed: integer;
+  maxBlue: integer;
+  power: integer;
 begin
   gameTotal := 0;
 
   for gameNumber := 0 to maxGames do
   begin
-    validGame := false;
+    maxGreen := 0;
+    maxRed := 0;
+    maxBlue := 0;
 
     for drawNumber := 0 to maxDraws do
     begin
@@ -142,21 +146,19 @@ begin
       if ((redDraws + blueDraws + greenDraws) = 0) then
         continue;
 
-      if ((redDraws > redCubes) or (blueDraws > blueCubes) or (greenDraws > greenCubes)) then
-      begin
-        validGame := false;
-        break;
-      end;
-
-      validGame := true;
+      if (redDraws > maxRed) then
+        maxRed := redDraws;
+      if (blueDraws > maxBlue) then
+        maxBlue := blueDraws;
+      if (greenDraws > maxGreen) then
+        maxGreen := greenDraws;
     end;
 
-    if (validGame) then
-    begin
-      debugNumber('Valid gameNumber', gameNumber + 1);
-      gameTotal := gameTotal + gameNumber + 1;
-    end;
+    if ((maxRed + maxBlue + maxGreen) = 0) then
+      continue;
 
+    power := maxRed * maxBlue * maxGreen;
+    gameTotal := gameTotal + power;
   end;
 
   calculateResult := gameTotal;
@@ -164,6 +166,6 @@ end;
 
 begin
   readInput;
-  result := calculateResult(12, 13, 14);
+  result := calculateResult;
   writeLn(result);
 end.
